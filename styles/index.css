@@ -1,3 +1,365 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    font-size: 18px;
+}
+
+.ltr {
+    text-align: left;
+}
+
+.rtl {
+    text-align: right;
+}
+
+.editor-container {
+    margin: 20px auto 20px auto;
+    border-radius: 2px;
+    max-width: 600px;
+    color: #000;
+    position: relative;
+    line-height: 20px;
+    font-weight: 400;
+    text-align: left;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.editor-inner {
+    background: #fff;
+    position: relative;
+}
+
+.editor-input {
+    min-height: 150px;
+    resize: none;
+    font-size: 15px;
+    caret-color: rgb(5, 5, 5);
+    position: relative;
+    tab-size: 1;
+    outline: 0;
+    padding: 15px 10px;
+    caret-color: #444;
+}
+
+.editor-placeholder {
+    color: #999;
+    overflow: hidden;
+    position: absolute;
+    text-overflow: ellipsis;
+    top: 15px;
+    left: 10px;
+    font-size: 15px;
+    user-select: none;
+    display: inline-block;
+    pointer-events: none;
+}
+
+.editor-text-bold {
+    font-weight: bold;
+}
+
+.editor-text-italic {
+    font-style: italic;
+}
+
+.editor-text-underline {
+    text-decoration: underline;
+}
+
+.editor-text-strikethrough {
+    text-decoration: line-through;
+}
+
+.editor-text-underlineStrikethrough {
+    text-decoration: underline line-through;
+}
+
+.editor-text-code {
+    background-color: rgb(240, 242, 245);
+    padding: 1px 0.25rem;
+    font-family: Menlo, Consolas, Monaco, monospace;
+    font-size: 94%;
+}
+
+.editor-link {
+    color: rgb(33, 111, 219);
+    text-decoration: none;
+}
+
+.tree-view-output {
+    display: block;
+    background: #222;
+    color: #fff;
+    padding: 5px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    margin: 1px auto 10px auto;
+    max-height: 250px;
+    position: relative;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow: auto;
+    line-height: 14px;
+}
+
+.editor-code {
+    background-color: rgb(240, 242, 245);
+    font-family: Menlo, Consolas, Monaco, monospace;
+    display: block;
+    padding: 8px 8px 8px 52px;
+    line-height: 1.53;
+    font-size: 13px;
+    margin: 0;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    tab-size: 2;
+    /* white-space: pre; */
+    overflow-x: auto;
+    position: relative;
+}
+
+.editor-code:before {
+    content: attr(data-gutter);
+    position: absolute;
+    background-color: #eee;
+    left: 0;
+    top: 0;
+    border-right: 1px solid #ccc;
+    padding: 8px;
+    color: #777;
+    white-space: pre-wrap;
+    text-align: right;
+    min-width: 25px;
+}
+
+.editor-code:after {
+    content: attr(data-highlight-language);
+    top: 0;
+    right: 3px;
+    padding: 3px;
+    font-size: 10px;
+    text-transform: uppercase;
+    position: absolute;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.editor-tokenComment {
+    color: slategray;
+}
+
+.editor-tokenPunctuation {
+    color: #999;
+}
+
+.editor-tokenProperty {
+    color: #905;
+}
+
+.editor-tokenSelector {
+    color: #690;
+}
+
+.editor-tokenOperator {
+    color: #9a6e3a;
+}
+
+.editor-tokenAttr {
+    color: #07a;
+}
+
+.editor-tokenVariable {
+    color: #e90;
+}
+
+.editor-tokenFunction {
+    color: #dd4a68;
+}
+
+.editor-paragraph {
+    margin: 0;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.editor-paragraph:last-child {
+    margin-bottom: 0;
+}
+
+.editor-heading-h2 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.editor-heading-h3 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.editor-quote {
+    margin: 0;
+    margin-left: 20px;
+    font-size: 15px;
+    color: rgb(101, 103, 107);
+    border-left-color: rgb(206, 208, 212);
+    border-left-width: 4px;
+    border-left-style: solid;
+    padding-left: 16px;
+}
+
+.editor-list-ol {
+    padding: 0;
+    margin: 0;
+    margin-left: 16px;
+    list-style-type: decimal;
+}
+
+.editor-list-ul {
+    padding: 0;
+    margin: 0;
+    margin-left: 16px;
+    list-style-type: disc;
+}
+
+.editor-listitem {
+    margin: 8px 32px 8px 32px;
+}
+
+.editor-nested-listitem {
+    list-style-type: none;
+}
+
+pre::-webkit-scrollbar {
+    background: transparent;
+    width: 10px;
+}
+
+pre::-webkit-scrollbar-thumb {
+    background: #999;
+}
+
+.ImageNode__contentEditable {
+    min-height: 20px;
+    resize: none;
+    cursor: text;
+    caret-color: rgb(5, 5, 5);
+    display: block;
+    position: relative;
+    tab-size: 1;
+    outline: 0px;
+    user-select: text;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: center;
+}
+
+.ImageNode__placeholder {
+    font-size: 12px;
+    color: #888;
+    overflow: hidden;
+    position: absolute;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-align: center;
+    bottom: 3px;
+    user-select: none;
+    white-space: nowrap;
+    display: inline-block;
+    pointer-events: none;
+}
+
+
+.Placeholder__root {
+    font-size: 15px;
+    color: #999;
+    overflow: hidden;
+    position: absolute;
+    text-overflow: ellipsis;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    user-select: none;
+    white-space: nowrap;
+    display: inline-block;
+    pointer-events: none;
+}
+
+
+span.editor-image {
+    cursor: default;
+    position: relative;
+    user-select: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+img.focused {
+    outline: 2px solid rgb(60, 132, 244);
+    user-select: none;
+}
+
+.editor-image .image-wrapper {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.image-caption-container .tree-view-output {
+    margin: 0;
+    border-radius: 0;
+}
+
+.image-caption-container {
+    left: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 100px;
+    color: #000;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    transition: 0.2s all ease-out;
+    display: none;
+}
+.image-caption-container.show {
+    display: block;
+}
+
+.image-caption-container p {
+    text-align: center;
+}
+
+.image-caption-button {
+    display: block;
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    width: 30%;
+    padding: 10px;
+    margin: 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    min-width: 100px;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+}
+
+.image-caption-button:hover {
+    background-color: rgba(60, 132, 244, 0.5);
+}
+
+
+.ContentEditable__root hr {
+    margin: 30px 0;
+}
