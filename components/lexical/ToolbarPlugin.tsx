@@ -53,28 +53,31 @@ import { createPortal } from 'react-dom';
 import TextFormatFloatingToolbarPlugin from './TextFormatFloatingToolbarPlugin';
 
 
-
-
-function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
-  const anchor = selection.anchor;
-  const focus = selection.focus;
-  const anchorNode = selection.anchor.getNode();
-  const focusNode = selection.focus.getNode();
-  if (anchorNode === focusNode) {
-    return anchorNode;
-  }
-  const isBackward = selection.isBackward();
-  if (isBackward) {
-    return $isAtNodeEnd(focus) ? anchorNode : focusNode;
-  } else {
-    return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
-  }
-}
-
+export const blockTypeToBlockName = {
+  bullet: 'Bulleted List',
+  check: 'Check List',
+  code: 'Code Block',
+  h1: 'Heading 1',
+  h2: 'Heading 2',
+  h3: 'Heading 3',
+  h4: 'Heading 4',
+  h5: 'Heading 5',
+  h6: 'Heading 6',
+  number: 'Numbered List',
+  paragraph: 'Normal',
+  quote: 'Quote',
+};
 
 const ToolbarPlugin = () => {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
+
+
+  const [blockType, setBlockType] =
+    useState<keyof typeof blockTypeToBlockName>('paragraph');
+  const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
+    null,
+  );
 
   useEffect(() => {
     editor.registerCommand(
@@ -90,25 +93,120 @@ const ToolbarPlugin = () => {
     return () => {
 
     }
-  }, [])
+  }, []);
+
+  const updateToolbar = useCallback(() => {
+    const selection = $getSelection();
+    if ($isRangeSelection(selection)) {
+      const anchorNode = selection.anchor.getNode();
+      const element =
+        anchorNode.getKey() === 'root'
+          ? anchorNode
+          : anchorNode.getTopLevelElementOrThrow();
+      const elementKey = element.getKey();
+      const elementDOM = activeEditor.getElementByKey(elementKey);
+
+
+      if (elementDOM !== null) {
+        setSelectedElementKey(elementKey);
+        if ($isListNode(element)) {
+          const parentList = $getNearestNodeOfType<ListNode>(
+            anchorNode,
+            ListNode,
+          );
+          const type = parentList
+            ? parentList.getListType()
+            : element.getListType();
+          setBlockType(type);
+        } else {
+          const type = $isHeadingNode(element)
+            ? element.getTag()
+            : element.getType();
+          if (type in blockTypeToBlockName) {
+            setBlockType(type as keyof typeof blockTypeToBlockName);
+          }
+        }
+      }
+    }
+  }, [activeEditor]);
 
 
   useEffect(() => {
     return editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
       (_payload, newEditor) => {
+        updateToolbar();
         setActiveEditor(newEditor);
         return false;
       },
       COMMAND_PRIORITY_CRITICAL,
     );
-  }, [editor]);
+  }, [editor, updateToolbar]);
+
+  useEffect(() => {
+    return mergeRegister(
+      activeEditor.registerUpdateListener(({editorState}) => {
+        editorState.read(() => {
+          updateToolbar();
+        });
+      }),
+    );
+  }, [activeEditor, updateToolbar]);
+
+  const formatHeading = (headingSize: HeadingTagType) => {
+    if (blockType !== headingSize) {
+      editor.update(() => {
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+          $wrapLeafNodesInElements(selection, () =>
+            $createHeadingNode(headingSize),
+          );
+        }
+      });
+    } else {
+      editor.update(() => {
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+          $wrapLeafNodesInElements(selection, () =>
+            $createParagraphNode(),
+          );
+        }
+      });
+    }
+  };
+
+  const formatQuote = () => {
+    if (blockType !== 'quote') {
+      editor.update(() => {
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+          $wrapLeafNodesInElements(selection, () => $createQuoteNode());
+        }
+      });
+    } else {
+      editor.update(() => {
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+          $wrapLeafNodesInElements(selection, () =>
+            $createParagraphNode(),
+          );
+        }
+      });
+    }
+  };
 
 
   return (
     <div className="text-slate-400 rounded fixed z-20 shadow-sm bottom-8 left-1/2 transform -translate-x-1/2 px-1 py-1 bg-slate-100 mb-2 flex items-center">
 
-      <TextFormatFloatingToolbarPlugin editor={activeEditor} />
+      <TextFormatFloatingToolbarPlugin
+      editor={activeEditor}
+      blockType={blockType}
+      />
 
       <button
         className='py-2 px-3 hover:bg-slate-200 transition-colors duration-100 ease-in rounded disabled:text-slate-300 disabled:hover:bg-inherit'
@@ -140,6 +238,39 @@ const ToolbarPlugin = () => {
         <FontAwesomeIcon icon={faImage} className='h-5' />
       </button>
 
+
+      <span className="w-[1px] bg-slate-300 text-slate-500 block h-[30px] mx-1"></span>
+
+      <button
+        className={clsx(
+          'py-2 px-3 hover:bg-slate-200 transition-colors duration-100 ease-in rounded disabled:text-slate-300 disabled:hover:bg-inherit',
+          (blockType === 'h2') ? 'bg-slate-300 text-slate-500' : 'bg-transparent'
+        )}
+        onClick={() => formatHeading('h2')}
+        disabled={!!editor._parentEditor}
+      >
+        <FontAwesomeIcon icon={faHeading} className='h-5' />
+      </button>
+      <button
+        className={clsx(
+          'py-2 px-3 hover:bg-slate-200 transition-colors duration-100 ease-in rounded disabled:text-slate-300 disabled:hover:bg-inherit',
+          (blockType === 'h3') ? 'bg-slate-300 text-slate-500' : 'bg-transparent'
+        )}
+        onClick={() => formatHeading('h3')}
+        disabled={!!editor._parentEditor}
+      >
+        <FontAwesomeIcon icon={faHeading} className='h-4' />
+      </button>
+      <button
+        className={clsx(
+          'py-2 px-3 hover:bg-slate-200 transition-colors duration-100 ease-in rounded disabled:text-slate-300 disabled:hover:bg-inherit',
+          (blockType === 'quote') ? 'bg-slate-300 text-slate-500' : 'bg-transparent'
+        )}
+        onClick={formatQuote}
+        disabled={!!editor._parentEditor}
+      >
+        <FontAwesomeIcon icon={faQuoteRight} className='h-5' />
+      </button>
     </div>
   );
 };
