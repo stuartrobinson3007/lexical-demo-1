@@ -2,6 +2,7 @@ import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
+  $isRangeSelection,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_HIGH,
   EditorConfig,
@@ -44,6 +45,7 @@ import ContentEditable from './ContentEditable';
 import Placeholder from './Placeholder';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import clsx from 'clsx';
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 
 export interface ImagePayload {
   altText: string;
@@ -223,6 +225,12 @@ function ImageComponent({
             } else {
               setShowCaption(true);
             }
+
+            const selection = $getSelection();
+            console.log("selected nested");
+
+            if ($isRangeSelection(selection)) {
+            }
           });
         }),
       );
@@ -233,7 +241,7 @@ function ImageComponent({
     return null;
   }
 
-  const OnEnterPlugin = ({  }) => {
+  const OnEnterPlugin = ({ }) => {
     const [nestedEditor] = useLexicalComposerContext();
 
     useEffect(() => {
@@ -292,6 +300,7 @@ function ImageComponent({
               />
               <HistoryPlugin />
               <TestPlugin />
+              <LinkPlugin />
               <OnEnterPlugin />
             </LexicalNestedComposer>
           </div>

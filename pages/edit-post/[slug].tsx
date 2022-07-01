@@ -12,7 +12,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-import {AutoScrollPlugin} from '@lexical/react/LexicalAutoScrollPlugin';
+import { AutoScrollPlugin } from '@lexical/react/LexicalAutoScrollPlugin';
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { TRANSFORMERS } from "@lexical/markdown";
@@ -32,6 +32,7 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import HorizontalRulePlugin from '../../components/lexical/HorizontalRulePlugin';
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { $getSelection, CLICK_COMMAND, COMMAND_PRIORITY_CRITICAL, COMMAND_PRIORITY_LOW, SELECTION_CHANGE_COMMAND } from 'lexical';
+import TextFormatFloatingToolbarPlugin from '../../components/lexical/TextFormatFloatingToolbarPlugin';
 
 function onError(error: Error) {
     console.error(error);
@@ -59,7 +60,6 @@ export const Editor = ({ post }) => {
         if (post) {
             setTitle(post.title);
             editorRef.current = post.content;
-            console.log(editorRef.current);
         }
     }, [post])
 
@@ -74,7 +74,8 @@ export const Editor = ({ post }) => {
             ImageNode,
             HeadingNode,
             HorizontalRuleNode,
-            QuoteNode
+            QuoteNode,
+            LinkNode
         ]
     };
 
@@ -146,6 +147,7 @@ export const Editor = ({ post }) => {
     }, []);
 
 
+
     const SetInitialRefPlugin = () => {
         const [editor] = useLexicalComposerContext();
         editorRef.current = editor.getEditorState();
@@ -153,7 +155,27 @@ export const Editor = ({ post }) => {
         return null;
     }
 
-    const containerWithScrollRef = useRef();
+    const [enterPressed, setEnterPressed] = useState(false);
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            if (e.key.toLowerCase() === "enter") {
+                setEnterPressed(!enterPressed);
+                e.preventDefault();
+            }
+        }
+    }
+
+    const TestPlugin = () => {
+        const [editor] = useLexicalComposerContext();
+
+        useEffect(() => {
+            // Focus the editor when the effect fires!
+            editor.focus();
+        }, [enterPressed]);
+
+        return null;
+    }
 
     return (
         <>
@@ -199,11 +221,11 @@ export const Editor = ({ post }) => {
                             ref={titleRef}
                             tabIndex={1}
                             onDrop={(e) => { e.preventDefault(); return false; }}
+                            onKeyDown={handleKeyDown}
                         />
 
                         <div
-                        className='relative mt-8 mb-36'
-                        ref={containerWithScrollRef}
+                            className='relative mt-8 mb-36'
                         >
                             <LexicalComposer
                                 initialConfig={initialConfig}
@@ -226,12 +248,13 @@ export const Editor = ({ post }) => {
                                     <HistoryPlugin />
                                     <ListPlugin />
                                     <ImagesPlugin />
+                                    <LinkPlugin />
                                     <HorizontalRulePlugin />
                                     <ListMaxIndentLevelPlugin maxDepth={7} />
                                     <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
                                     <OnChangePlugin onChange={editorState => { setHasChanged(true); editorRef.current = editorState }} ignoreSelectionChange={true} />
                                     <SetInitialRefPlugin />
-                                    <AutoScrollPlugin scrollRef={containerWithScrollRef} />
+                                    <TestPlugin />
                                 </SharedHistoryContext>
                             </LexicalComposer>
                         </div>
