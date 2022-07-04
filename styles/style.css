@@ -1302,7 +1302,7 @@ body {
 
 .editor-paragraph {
   margin: 0;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   position: relative;
 }
 
@@ -1313,14 +1313,15 @@ body {
 .editor-heading-h2 {
   font-size: 32px;
   font-weight: bold;
-  margin-top: 10px;
+  margin-top: 22px;
+  margin-bottom: 12px;
 }
 
 .editor-heading-h3 {
   font-size: 22px;
   font-weight: bold;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 18px;
+  margin-bottom: 12px;
 }
 
 .editor-quote {

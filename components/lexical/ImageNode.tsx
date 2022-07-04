@@ -58,6 +58,9 @@ import { faAnchorLock } from '@fortawesome/free-solid-svg-icons';
 import {
   $isAtNodeEnd,
 } from '@lexical/selection';
+import {
+  $isHeadingNode
+} from '@lexical/rich-text';
 import { triggerAsyncId } from 'async_hooks';
 
 export interface ImagePayload {
@@ -178,7 +181,7 @@ function ImageComponent({
 
         let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
 
-        if ($isTextNode(anchorNode)) {
+        if ($isTextNode(anchorNode) || $isHeadingNode(anchorNode)) {
           anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
         }
         if (!anchorNode) return false;
@@ -214,7 +217,7 @@ function ImageComponent({
 
         let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
 
-        if ($isTextNode(anchorNode)) {
+        if ($isTextNode(anchorNode) || $isHeadingNode(anchorNode)) {
           anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
         }
         if (!anchorNode) return false;
@@ -271,7 +274,7 @@ function ImageComponent({
         }
 
         let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
-        if ($isTextNode(anchorNode)) {
+        if ($isTextNode(anchorNode) || $isHeadingNode(anchorNode)) {
           anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
         }
         if (!anchorNode) return false;
