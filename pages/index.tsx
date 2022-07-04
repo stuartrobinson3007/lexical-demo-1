@@ -1,94 +1,93 @@
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import { PrismaClient } from '@prisma/client';
-import Link from 'next/link';
+import React, {  } from 'react';
 
-const blogData = [
-  {
-    title: 'Blog title 1',
-    summary: 'Blog summary goes here'
-  },
-  {
-    title: 'Blog title 2',
-    summary: 'Blog summary goes here'
-  },
-  {
-    title: 'Blog title 3',
-    summary: 'Blog summary goes here'
-  },
-  {
-    title: 'Blog title 4',
-    summary: 'Blog summary goes here'
-  },
-  {
-    title: 'Blog title 5',
-    summary: 'Blog summary goes here'
-  },
-];
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
+import { ContentEditable } from '@lexical/react/LexicalContentEditable';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { ListItemNode, ListNode } from '@lexical/list';
+import { CodeHighlightNode, CodeNode } from '@lexical/code';
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import {LinkNode} from '@lexical/link';
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
+import { TRANSFORMERS } from '@lexical/markdown';
+import ListMaxIndentLevelPlugin from '../components/lexical/ListMaxIndentLevelPlugin';
+import ToolbarPlugin from '../components/lexical/ToolbarPlugin';
+import ExampleTheme from '../components/lexical/Theme';
 
-type IHome = {
-  allPosts: any
+import ImagesPlugin from '../components/lexical/ImagesPlugin';
+import { SharedHistoryContext } from '../components/lexical/SharedHistoryContext';
+import { ImageNode } from '../components/lexical/ImageNode';
+import HorizontalRulePlugin from '../components/lexical/HorizontalRulePlugin';
+import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import CodeHighlightPlugin from '../components/lexical/CodeHighlightPlugin';
+
+import * as content from './demo.json';
+
+function onError(error: Error) {
+    console.error(error);
 }
 
-const Home: NextPage<IHome> = ({ allPosts }) => {
-  const pageTitle = "Stuart Robinson | Home";
-  const pageDescription = "Meta description.";
+export const Editor = () => {
 
-  const _allPosts = JSON.parse(allPosts);
 
-  return (
-    <div>
-      <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta name="twitter:title" content={pageTitle} />
-        <meta name="twitter:description" content={pageDescription} />
-        <meta name="keywords" content="keyword, keyword" />
-      </Head>
+    const initialConfig = {
+        namespace: 'MyEditor',
+        theme: ExampleTheme,
+        onError,
+        nodes: [
+            ListNode,
+            ListItemNode,
+            ImageNode,
+            LinkNode,
+            HeadingNode,
+            HorizontalRuleNode,
+            QuoteNode,
+            CodeNode,
+            CodeHighlightNode
+        ]
+    };
 
-      <div className='mt-40 max-w-4xl m-auto'>
-        <div className='grid grid-cols-3 gap-16'>
-          {_allPosts.map((data, index) => {
-            return (
-              <Link href={`/blog/${data.slug}`} key={index}>
-                <a className='border-2 border-slate-400 rounded p-4 hover:bg-slate-100'>
-                  <div className='font-bold'>{data.title}</div>
-                </a>
-              </Link>
-            )
-          })}
+    return (
+        <div className='bg-white border-slate-200 relative max-w-screen-md mt-32 mx-auto px-4 sm:px-6 lg:px-0'>
+
+            
+            <div
+                className='relative mt-8 mb-36'
+            >
+                <LexicalComposer
+                    initialConfig={initialConfig}
+                >
+                    <SharedHistoryContext>
+                        <ToolbarPlugin />
+                        <RichTextPlugin
+                            contentEditable={
+                                <ContentEditable
+                                    className='ContentEditable__root relative min-h-[450px] outline-none resize-none' />
+                            }
+                            placeholder={
+                                <div className='absolute top-[0px] text-gray-500 left-[2px] pointer-events-none select-none'>
+                                    Enter some text...
+                                </div>
+                            }
+                            initialEditorState={JSON.stringify(content)}
+                        />
+                        <HistoryPlugin />
+                        <CodeHighlightPlugin />
+                        <ListPlugin />
+                        <ImagesPlugin />
+                        <LinkPlugin />
+                        <HorizontalRulePlugin />
+                        <ListMaxIndentLevelPlugin maxDepth={7} />
+                        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+
+                    </SharedHistoryContext>
+                </LexicalComposer>
+            </div>
         </div>
-
-        <div className='mt-12 flex justify-center'>
-          <Link href='/new-post'>
-            <a className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'>
-              Create a new post
-            </a>
-          </Link>
-        </div>
-      </div>
-
-    </div >
-  )
-}
-
-export default Home;
+    );
+};
 
 
-// This function gets called at build time on server-side.
-// It may be called again, on a serverless function, if
-// revalidation is enabled and a new request comes in
-export async function getStaticProps() {
-  const prisma = new PrismaClient();
-  const allPosts = JSON.stringify(await prisma.post.findMany());
-
-  return {
-    props: { allPosts },
-    // Next.js will attempt to re-generate the page:
-    // - When a request comes in
-    // - At most once every 10 seconds
-    revalidate: 1000
-  }
-}
+export default Editor;

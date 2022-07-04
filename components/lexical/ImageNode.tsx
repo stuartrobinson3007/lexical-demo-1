@@ -1,13 +1,6 @@
 import {
-  $createParagraphNode,
-  $createTextNode,
-  $getRoot,
-  $isElementNode,
-  $isParagraphNode,
   $isRangeSelection,
   $isTextNode,
-  COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_HIGH,
   EditorConfig,
   ElementNode,
   GridSelection,
@@ -15,7 +8,6 @@ import {
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
   KEY_ARROW_UP_COMMAND,
-  KEY_ENTER_COMMAND,
   LexicalEditor,
   LexicalNode,
   NodeKey,
@@ -29,8 +21,6 @@ import {
 
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer';
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
 import {
@@ -47,21 +37,12 @@ import {
 import * as React from 'react';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 
-import { useSharedHistoryContext } from './SharedHistoryContext';
-import ImagesPlugin from './ImagesPlugin';
-import ContentEditable from './ContentEditable';
-import Placeholder from './Placeholder';
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
-import clsx from 'clsx';
-import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
-import { faAnchorLock } from '@fortawesome/free-solid-svg-icons';
 import {
   $isAtNodeEnd,
 } from '@lexical/selection';
 import {
   $isHeadingNode
 } from '@lexical/rich-text';
-import { triggerAsyncId } from 'async_hooks';
 
 export interface ImagePayload {
   altText: string;
@@ -144,20 +125,21 @@ function ImageComponent({
     RangeSelection | NodeSelection | GridSelection | null
   >(null);
 
-  const captionRef = useRef(null);
-
-  const [captionSelected, setCaptionSelected] = useState(false);
-
+  // Remove the image and select the node before it
   const deleteImage = useCallback(
     (payload: KeyboardEvent) => {
 
+      // Check that we've got the image selected
       if (isSelected && $isNodeSelection($getSelection())) {
+
+        // Prevent any default keyboard action as we want to handle the node removal manually
         const event: KeyboardEvent = payload;
         event.preventDefault();
+
+        // Get the node, check it's an image, remove it, and select the node before it so the user can keep typing
         const node = $getNodeByKey(nodeKey);
         if ($isImageNode(node)) {
-
-          unselectBackwards(payload);
+          deselectBackwards(payload);
           node.remove();
           return true;
         }
@@ -169,64 +151,39 @@ function ImageComponent({
     [isSelected, nodeKey, setSelected],
   );
 
+  // If the user presses backspace, left, or up
+  // We want to check if we're selecting the node after the image and we want to move the selection to the image
+  // Or check if we're selecting the image and we want to move the selection to the node before it
   const onBack = useCallback(
     (payload: KeyboardEvent) => {
       const selection = $getSelection();
 
       if ($isRangeSelection(selection)) {
 
+        // This currently only works properly when the user presses backspace or left because the following line tries to make sure that the caret is at the start of the line.
+        // E.g. the caret is at the start of the line that is directly after the image, so pressing backspace or left will select the image above.
         if (selection.anchor.offset > 0) {
           return false;
         }
-
-        let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
-
-        if ($isTextNode(anchorNode) || $isHeadingNode(anchorNode)) {
-          anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
-        }
-        if (!anchorNode) return false;
-
-        const previousKey = anchorNode.getPreviousSibling()?.getKey();
-
-        if (previousKey === nodeKey) {
-          setSelected(true);
-          setCaptionSelected(true);
-
-          const event: KeyboardEvent = payload;
-          event.preventDefault();
-          return true;
-        }
-      }
-
-      if (payload.key == 'Backspace') {
-        return deleteImage(payload);
-      } else {
-        return unselectBackwards(payload);
-      }
-    }, [isSelected, nodeKey, setSelected]);
-
-  const onDelete = useCallback(
-    (payload: KeyboardEvent) => {
-      const selection = $getSelection();
-
-      if ($isRangeSelection(selection)) {
-
-        if (!$isAtNodeEnd(selection.anchor)) {
+        // Additionally to that check, we also want the up key to select the image above if the caret is on the first line of the following paragraph.
+        /* E.g.
+        if (payload.key = 'ArrowUp' && !selection.anchor.notOnFirstLine()) {
           return false;
         }
+        */
 
         let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
 
+        // If the anchor node is a text node, we need to get the parent node to get the image node above it using getPreviousSibling()
         if ($isTextNode(anchorNode) || $isHeadingNode(anchorNode)) {
           anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
         }
         if (!anchorNode) return false;
 
-        const nextKey = anchorNode.getNextSibling()?.getKey();
-
-        if (nextKey === nodeKey) {
+        // Select the image node above the current node
+        const previousKey = anchorNode.getPreviousSibling()?.getKey();
+        if (previousKey === nodeKey) {
           setSelected(true);
-          setCaptionSelected(true);
 
           const event: KeyboardEvent = payload;
           event.preventDefault();
@@ -234,62 +191,74 @@ function ImageComponent({
         }
       }
 
-      return deleteImage(payload);
-
-    }, [isSelected, nodeKey, setSelected]);
-
-  const unselectBackwards = useCallback(
-    (payload: KeyboardEvent) => {
-      const selection = $getSelection();
-
-      if (isSelected && $isNodeSelection(selection)) {
-        const event: KeyboardEvent = payload;
-        event.preventDefault();
-        const node = $getNodeByKey(nodeKey);
-        if ($isImageNode(node)) {
-          const previousSibling = node.getPreviousSibling();
-          console.log("here ok")
-
-          if (previousSibling !== null) {
-            console.log("here ok????")
-            node.selectPrevious();
-            setCaptionSelected(false);
-            return true;
-          }
-        }
+      // If we've reached this point, it means that we're not in a range selection
+      // That means we might be in a node selection which might be this image
+      if (payload.key == 'Backspace') {
+        // If we're handling a backspace key press, run the delete function to see if we're trying to delete this image
+        return deleteImage(payload);
+      } else {
+        // Otherwise we're handling a left or up key press so we want to deselect the image and select the node above it
+        return deselectBackwards(payload);
       }
-      return false;
-
     }, [isSelected, nodeKey, setSelected]);
 
+  // If the user presses delete, right, or down
+  // We want to check if we're selecting the node before the image and we want to move the selection to the image
+  // Or check if we're selecting the image and we want to move the selection to the node after it
   const onForwards = useCallback(
     (payload: KeyboardEvent) => {
       const selection = $getSelection();
 
       if ($isRangeSelection(selection)) {
 
-        console.log($isAtNodeEnd(selection.anchor))
+        // This currently only works properly when the user presses delete or right because the following line tries to make sure that the caret is at the end of the line.
+        // E.g. the caret is at the end of the line that is directly before the image, so pressing delete or right will select the image above.
         if (!$isAtNodeEnd(selection.anchor)) {
           return false;
         }
+        // Additionally to that check, we also want the down key to select the image below if the caret is on the last line of the paragraph right before it.
+        /* E.g.
+        if (payload.key = 'ArrowDown' && !selection.anchor.notOnLastLine()) {
+          return false;
+        }
+        */
 
         let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
+
+        // If the anchor node is a text node, we need to get the parent node to get the image node above it using getNextSibling()
         if ($isTextNode(anchorNode) || $isHeadingNode(anchorNode)) {
           anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
         }
         if (!anchorNode) return false;
 
+        // Select the image node below the current node
         const nextKey = anchorNode.getNextSibling()?.getKey();
 
         if (nextKey === nodeKey) {
           setSelected(true);
-          setCaptionSelected(true);
 
           const event: KeyboardEvent = payload;
           event.preventDefault();
           return true;
         }
       }
+
+      // If we've reached this point, it means that we're not in a range selection
+      // That means we might be in a node selection which might be this image
+      if (payload.key == 'Delete') {
+        // If we're handling a backspace key press, run the delete function to see if we're trying to delete this image
+        return deleteImage(payload);
+      } else {
+        // Otherwise we're handling a right or down key press so we want to deselect the image and select the node above it
+        return deselectForwards(payload);
+      }
+
+    }, [isSelected, nodeKey, setSelected]);
+
+  // Select the node below the current image
+  const deselectForwards = useCallback(
+    (payload: KeyboardEvent) => {
+      const selection = $getSelection();
 
       if (isSelected && $isNodeSelection(selection)) {
         const event: KeyboardEvent = payload;
@@ -300,7 +269,27 @@ function ImageComponent({
 
           if (nextSibling !== null) {
             node.selectNext();
-            setCaptionSelected(false);
+            return true;
+          }
+        }
+      }
+      return false;
+    }, [isSelected, nodeKey, setSelected]);
+
+  // Select the node above the current image
+  const deselectBackwards = useCallback(
+    (payload: KeyboardEvent) => {
+      const selection = $getSelection();
+
+      if (isSelected && $isNodeSelection(selection)) {
+        const event: KeyboardEvent = payload;
+        event.preventDefault();
+        const node = $getNodeByKey(nodeKey);
+        if ($isImageNode(node)) {
+          const previousSibling = node.getPreviousSibling();
+
+          if (previousSibling !== null) {
+            node.selectPrevious();
             return true;
           }
         }
@@ -308,6 +297,7 @@ function ImageComponent({
       return false;
 
     }, [isSelected, nodeKey, setSelected]);
+
 
   useEffect(() => {
     return mergeRegister(
@@ -319,20 +309,13 @@ function ImageComponent({
         (payload) => {
           const event = payload;
 
-          if (captionRef.current && (event.target.closest('.image-caption-container') === captionRef.current)) {
-            setCaptionSelected(true)
-            return true;
-          }
-
           if (event.target === ref.current) {
             if (!event.shiftKey) {
               clearSelection();
             }
             setSelected(true);
-            setCaptionSelected(true);
             return true;
           }
-          setCaptionSelected(false)
 
           return false;
         },
@@ -340,7 +323,7 @@ function ImageComponent({
       ),
       editor.registerCommand(
         KEY_DELETE_COMMAND,
-        onDelete,
+        onForwards,
         COMMAND_PRIORITY_LOW,
       ),
       editor.registerCommand(
@@ -378,66 +361,9 @@ function ImageComponent({
     setSelected,
   ]);
 
-  const setShowCaption = (show: boolean) => {
-    editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
-      if ($isImageNode(node)) {
-        node.setShowCaption(show);
-      }
-    });
-  };
-
-  const { historyState } = useSharedHistoryContext();
-
   const draggable = isSelected && $isNodeSelection(selection);
   const isFocused = ($isNodeSelection(selection) && (isSelected));
 
-  const TestPlugin = () => {
-
-    const [nestedEditor] = useLexicalComposerContext();
-
-    useEffect(() => {
-      return mergeRegister(
-        nestedEditor.registerUpdateListener(({ editorState }) => {
-          editorState.read(() => {
-            const root = $getRoot();
-            if (!root.getFirstChild() || root.getFirstChild()?.isEmpty()) {
-              setShowCaption(false);
-            } else {
-              setShowCaption(true);
-            }
-
-            const selection = $getSelection();
-            console.log("selected nested");
-
-            if ($isRangeSelection(selection)) {
-            }
-          });
-        }),
-      );
-    }, [
-      nestedEditor
-    ]);
-
-    return null;
-  }
-
-  const OnEnterPlugin = ({ }) => {
-    const [nestedEditor] = useLexicalComposerContext();
-
-    useEffect(() => {
-      return nestedEditor.registerCommand(
-        KEY_ENTER_COMMAND,
-        (e: KeyboardEvent) => {
-          e.preventDefault();
-          return true;
-        },
-        COMMAND_PRIORITY_CRITICAL,
-      );
-    }, [nestedEditor]);
-
-    return null;
-  }
 
   return (
     <Suspense fallback={null}>
@@ -454,37 +380,6 @@ function ImageComponent({
             width={width}
             height={height}
           />
-
-          <div
-            className={
-              clsx("image-caption-container",
-                (captionSelected || showCaption) ? "show" : null)
-            }
-            ref={captionRef}
-          >
-            <LexicalNestedComposer
-              initialEditor={caption}
-            >
-              <ImagesPlugin />
-
-              <RichTextPlugin
-                contentEditable={
-                  <ContentEditable className="ImageNode__contentEditable" />
-                }
-                placeholder={
-                  <Placeholder className="ImageNode__placeholder">
-                    Image caption (optional)
-                  </Placeholder>
-                }
-                // TODO Remove after it's inherited from the parent (LexicalComposer)
-                initialEditorState={null}
-              />
-              <HistoryPlugin />
-              <TestPlugin />
-              <LinkPlugin />
-              <OnEnterPlugin />
-            </LexicalNestedComposer>
-          </div>
         </div>
 
       </>

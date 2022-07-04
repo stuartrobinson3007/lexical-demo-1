@@ -1,0 +1,533 @@
+{
+    "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+            {
+                "tag": "h1",
+                "type": "heading",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Oh no! The professor will hit me! But if Zoidberg 'fixes' it… then perhaps gifts!",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Shut up and take my money! Calculon is gonna kill us and it's all everybody else's fault! I suppose I could part with 'one' and still be feared… Well, thanks to the Internet, I'm now bored with sex. Is there a place on the web that panders to my lust for violence?",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Is that a cooking show? I love this planet! ",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    },
+                    {
+                        "mode": "normal",
+                        "text": "I've got wealth, fame, and access to the depths of sleaze that those things bring.",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 1,
+                        "version": 1
+                    },
+                    {
+                        "mode": "normal",
+                        "text": " ",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    },
+                    {
+                        "mode": "normal",
+                        "text": "Who are those horrible orange men?",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 2,
+                        "version": 1
+                    },
+                    {
+                        "mode": "normal",
+                        "text": " We don't have a brig.",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "src": "https://source.unsplash.com/random",
+                "type": "image",
+                "width": 0,
+                "height": 0,
+                "altText": "image",
+                "caption": {
+                    "editorState": {
+                        "root": {
+                            "type": "root",
+                            "format": "",
+                            "indent": 0,
+                            "version": 1,
+                            "children": [],
+                            "direction": null
+                        }
+                    }
+                },
+                "version": 1,
+                "showCaption": false
+            },
+            {
+                "tag": "h2",
+                "type": "heading",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "I'm Santa Claus!",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Doomsday device? Ah, now the ball's in Farnsworth's court! Hey, what kinda party is this? There's no booze and only one hooker. Calculon is gonna kill us and it's all everybody else's fault! OK, this has gotta stop. I'm going to remind Fry of his humanity the way only a woman can.",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "tag": "ol",
+                "type": "list",
+                "start": 1,
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "type": "listitem",
+                        "value": 1,
+                        "format": "",
+                        "indent": 0,
+                        "version": 1,
+                        "children": [
+                            {
+                                "mode": "normal",
+                                "text": "Is today's hectic lifestyle making you tense and impatient?",
+                                "type": "text",
+                                "style": "",
+                                "detail": 0,
+                                "format": 0,
+                                "version": 1
+                            }
+                        ],
+                        "direction": "ltr"
+                    },
+                    {
+                        "type": "listitem",
+                        "value": 2,
+                        "format": "",
+                        "indent": 0,
+                        "version": 1,
+                        "children": [
+                            {
+                                "mode": "normal",
+                                "text": "Large bet on myself in round one.",
+                                "type": "text",
+                                "style": "",
+                                "detail": 0,
+                                "format": 0,
+                                "version": 1
+                            }
+                        ],
+                        "direction": "ltr"
+                    },
+                    {
+                        "type": "listitem",
+                        "value": 3,
+                        "format": "",
+                        "indent": 0,
+                        "version": 1,
+                        "children": [
+                            {
+                                "mode": "normal",
+                                "text": "Fry! Stay back! He's too powerful!",
+                                "type": "text",
+                                "style": "",
+                                "detail": 0,
+                                "format": 0,
+                                "version": 1
+                            }
+                        ],
+                        "direction": "ltr"
+                    }
+                ],
+                "listType": "number",
+                "direction": "ltr"
+            },
+            {
+                "tag": "h3",
+                "type": "heading",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Eeeee! Now say \"nuclear wessels\"!",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "This opera's as lousy as it is brilliant! Your lyrics lack subtlety. You can't just have your characters announce how they feel. That makes me feel angry! Leela, Bender, we're going grave robbing. No! The kind with looting and maybe starting a few fires!",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "tag": "ul",
+                "type": "list",
+                "start": 1,
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "type": "listitem",
+                        "value": 1,
+                        "format": "",
+                        "indent": 0,
+                        "version": 1,
+                        "children": [
+                            {
+                                "mode": "normal",
+                                "text": "Would you censor the Venus de Venus just because you can see her spewers?",
+                                "type": "text",
+                                "style": "",
+                                "detail": 0,
+                                "format": 0,
+                                "version": 1
+                            }
+                        ],
+                        "direction": "ltr"
+                    },
+                    {
+                        "type": "listitem",
+                        "value": 2,
+                        "format": "",
+                        "indent": 0,
+                        "version": 1,
+                        "children": [
+                            {
+                                "mode": "normal",
+                                "text": "I guess because my parents keep telling me to be more ladylike. As though!",
+                                "type": "text",
+                                "style": "",
+                                "detail": 0,
+                                "format": 0,
+                                "version": 1
+                            }
+                        ],
+                        "direction": "ltr"
+                    },
+                    {
+                        "type": "listitem",
+                        "value": 3,
+                        "format": "",
+                        "indent": 0,
+                        "version": 1,
+                        "children": [
+                            {
+                                "mode": "normal",
+                                "text": "There's no part of that sentence I didn't like!",
+                                "type": "text",
+                                "style": "",
+                                "detail": 0,
+                                "format": 0,
+                                "version": 1
+                            }
+                        ],
+                        "direction": "ltr"
+                    }
+                ],
+                "listType": "bullet",
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Who are you, my warranty?! Quite possible. We live long and are celebrated poopers. Leela, are you alright? You got wanged on the head. Shut up and get to the point! Now that the, uh, garbage ball is in space, Doctor, perhaps you can help me with my sexual inhibitions?",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "I videotape every customer that comes in here, so that I may blackmail them later. Fry! Quit doing the right thing, you jerk! I don't 'need' to drink. I can quit anytime I want! Now, now. Perfectly symmetrical violence never solved anything.",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Why am I sticky and naked? Did I miss something fun? A sexy mistake. Come, Comrade Bender! We must take to the streets! Hey, you add a one and two zeros to that or we walk!",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Guards! Bring me the forms I need to fill out to have her taken away! So, how 'bout them Knicks? That's right, baby. I ain't your loverboy Flexo, the guy you love so much. You even love anyone pretending to be him!",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "I meant 'physically'. Look, perhaps you could let me work for a little food? I could clean the floors or paint a fence, or service you sexually? It must be wonderful. Whoa a real live robot; or is that some kind of cheesy New Year's costume?",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Oh Leela! You're the only person I could turn to; you're the only person who ever loved me. Ven ve voke up, ve had zese wodies. Please, Don-Bot… look into your hard drive, and open your mercy file!",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "I'll get my kit! I found what I need. And it's not friends, it's things. Please, Don-Bot… look into your hard drive, and open your mercy file! I love this planet! I've got wealth, fame, and access to the depths of sleaze that those things bring.",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "This opera's as lousy as it is brilliant! Your lyrics lack subtlety. You can't just have your characters announce how they feel. That makes me feel angry! Soothe us with sweet lies. I guess if you want children beaten, you have to do it yourself.",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Yeah, lots of people did. Wow! A superpowers drug you can just rub onto your skin? You'd think it would be something you'd have to freebase. Ask her how her day was. Oh right. I forgot about the battle.",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "Ok, we'll go deliver this crate like professionals, and then we'll go ride the bumper cars. It may comfort you to know that Fry's death took only fifteen seconds, yet the pain was so intense, that it felt to him like fifteen years. And it goes without saying, it caused him to empty his bowels.",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            },
+            {
+                "type": "paragraph",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "children": [
+                    {
+                        "mode": "normal",
+                        "text": "WINDMILLS DO NOT WORK THAT WAY! GOOD NIGHT! Okay, I like a challenge. Kids don't turn rotten just from watching TV. Robot 1-X, save my friends! And Zoidberg! Bender, you risked your life to save me!",
+                        "type": "text",
+                        "style": "",
+                        "detail": 0,
+                        "format": 0,
+                        "version": 1
+                    }
+                ],
+                "direction": "ltr"
+            }
+        ],
+        "direction": "ltr"
+    }
+}
