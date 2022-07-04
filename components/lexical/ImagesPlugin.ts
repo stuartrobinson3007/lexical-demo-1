@@ -56,9 +56,9 @@ export default function ImagesPlugin(): JSX.Element | null {
         editorState.read(() => {
           const selection = $getSelection();
           //console.log("selection", selection);
-    
+
           if ($isRangeSelection(selection)) {
-    
+
             const anchorNode = selection.anchor.getNode();
             const element =
               anchorNode.getKey() === 'root'
@@ -66,8 +66,8 @@ export default function ImagesPlugin(): JSX.Element | null {
                 : anchorNode.getTopLevelElementOrThrow();
             const elementKey = element.getKey();
             const elementDOM = editor.getElementByKey(elementKey);
-    
-    
+
+
             if (elementDOM !== null) {
               if ($isImageNode(element)) {
                 console.log("in an image")
@@ -85,10 +85,10 @@ export default function ImagesPlugin(): JSX.Element | null {
             const focusNode = selection.focus.getNode();
             focusNode.getTopLevelElementOrThrow().insertAfter(ImageNode);
           } else if ($isNodeSelection(selection)) {
-            const nodes = selection.getNodes();
-            nodes[nodes.length - 1]
-              .getTopLevelElementOrThrow()
-              .insertAfter(ImageNode);
+            const node = selection.getNodes()[0];
+            const paragraphNode = $createParagraphNode();
+            node.insertAfter(paragraphNode);
+            paragraphNode.insertAfter(ImageNode);
           } else {
             const root = $getRoot();
             root.append(ImageNode);

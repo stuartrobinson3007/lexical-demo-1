@@ -2,11 +2,19 @@ import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
+  $isElementNode,
+  $isParagraphNode,
   $isRangeSelection,
+  $isTextNode,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_HIGH,
   EditorConfig,
+  ElementNode,
   GridSelection,
+  KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_LEFT_COMMAND,
+  KEY_ARROW_RIGHT_COMMAND,
+  KEY_ARROW_UP_COMMAND,
   KEY_ENTER_COMMAND,
   LexicalEditor,
   LexicalNode,
@@ -46,6 +54,11 @@ import Placeholder from './Placeholder';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import clsx from 'clsx';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import { faAnchorLock } from '@fortawesome/free-solid-svg-icons';
+import {
+  $isAtNodeEnd,
+} from '@lexical/selection';
+import { triggerAsyncId } from 'async_hooks';
 
 export interface ImagePayload {
   altText: string;
@@ -132,21 +145,166 @@ function ImageComponent({
 
   const [captionSelected, setCaptionSelected] = useState(false);
 
-  const onDelete = useCallback(
+  const deleteImage = useCallback(
     (payload: KeyboardEvent) => {
+
       if (isSelected && $isNodeSelection($getSelection())) {
         const event: KeyboardEvent = payload;
         event.preventDefault();
         const node = $getNodeByKey(nodeKey);
         if ($isImageNode(node)) {
+
+          unselectBackwards(payload);
           node.remove();
+          return true;
         }
         setSelected(false);
       }
       return false;
+
     },
     [isSelected, nodeKey, setSelected],
   );
+
+  const onBack = useCallback(
+    (payload: KeyboardEvent) => {
+      const selection = $getSelection();
+
+      if ($isRangeSelection(selection)) {
+
+        if (selection.anchor.offset > 0) {
+          return false;
+        }
+
+        let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
+
+        if ($isTextNode(anchorNode)) {
+          anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
+        }
+        if (!anchorNode) return false;
+
+        const previousKey = anchorNode.getPreviousSibling()?.getKey();
+
+        if (previousKey === nodeKey) {
+          setSelected(true);
+          setCaptionSelected(true);
+
+          const event: KeyboardEvent = payload;
+          event.preventDefault();
+          return true;
+        }
+      }
+
+      if (payload.key == 'Backspace') {
+        return deleteImage(payload);
+      } else {
+        return unselectBackwards(payload);
+      }
+    }, [isSelected, nodeKey, setSelected]);
+
+  const onDelete = useCallback(
+    (payload: KeyboardEvent) => {
+      const selection = $getSelection();
+
+      if ($isRangeSelection(selection)) {
+
+        if (!$isAtNodeEnd(selection.anchor)) {
+          return false;
+        }
+
+        let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
+
+        if ($isTextNode(anchorNode)) {
+          anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
+        }
+        if (!anchorNode) return false;
+
+        const nextKey = anchorNode.getNextSibling()?.getKey();
+
+        if (nextKey === nodeKey) {
+          setSelected(true);
+          setCaptionSelected(true);
+
+          const event: KeyboardEvent = payload;
+          event.preventDefault();
+          return true;
+        }
+      }
+
+      return deleteImage(payload);
+
+    }, [isSelected, nodeKey, setSelected]);
+
+  const unselectBackwards = useCallback(
+    (payload: KeyboardEvent) => {
+      const selection = $getSelection();
+
+      if (isSelected && $isNodeSelection(selection)) {
+        const event: KeyboardEvent = payload;
+        event.preventDefault();
+        const node = $getNodeByKey(nodeKey);
+        if ($isImageNode(node)) {
+          const previousSibling = node.getPreviousSibling();
+          console.log("here ok")
+
+          if (previousSibling !== null) {
+            console.log("here ok????")
+            node.selectPrevious();
+            setCaptionSelected(false);
+            return true;
+          }
+        }
+      }
+      return false;
+
+    }, [isSelected, nodeKey, setSelected]);
+
+  const onForwards = useCallback(
+    (payload: KeyboardEvent) => {
+      const selection = $getSelection();
+
+      if ($isRangeSelection(selection)) {
+
+        console.log($isAtNodeEnd(selection.anchor))
+        if (!$isAtNodeEnd(selection.anchor)) {
+          return false;
+        }
+
+        let anchorNode: (TextNode | ElementNode | null) = selection.anchor.getNode();
+        if ($isTextNode(anchorNode)) {
+          anchorNode = anchorNode.getParent() ? anchorNode.getParent() : null;
+        }
+        if (!anchorNode) return false;
+
+        const nextKey = anchorNode.getNextSibling()?.getKey();
+
+        if (nextKey === nodeKey) {
+          setSelected(true);
+          setCaptionSelected(true);
+
+          const event: KeyboardEvent = payload;
+          event.preventDefault();
+          return true;
+        }
+      }
+
+      if (isSelected && $isNodeSelection(selection)) {
+        const event: KeyboardEvent = payload;
+        event.preventDefault();
+        const node = $getNodeByKey(nodeKey);
+        if ($isImageNode(node)) {
+          const nextSibling = node.getNextSibling();
+
+          if (nextSibling !== null) {
+            node.selectNext();
+            setCaptionSelected(false);
+            return true;
+          }
+        }
+      }
+      return false;
+
+    }, [isSelected, nodeKey, setSelected]);
 
   useEffect(() => {
     return mergeRegister(
@@ -184,7 +342,27 @@ function ImageComponent({
       ),
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
-        onDelete,
+        onBack,
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_LEFT_COMMAND,
+        onBack,
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_UP_COMMAND,
+        onBack,
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_RIGHT_COMMAND,
+        onForwards,
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_DOWN_COMMAND,
+        onForwards,
         COMMAND_PRIORITY_LOW,
       ),
     );
