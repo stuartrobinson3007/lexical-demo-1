@@ -86,7 +86,7 @@ body {
 
 .editor-link {
     color: rgb(33, 111, 219);
-    text-decoration: none;
+    text-decoration: underline;
 }
 
 .tree-view-output {

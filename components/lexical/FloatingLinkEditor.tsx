@@ -73,7 +73,6 @@ function FloatingLinkEditor({ editor }: { editor: LexicalEditor }): JSX.Element 
 
         const elem = referenceElementRef.current;
 
-
         if (
             selection !== null &&
             !nativeSelection.isCollapsed &&
@@ -143,7 +142,6 @@ function FloatingLinkEditor({ editor }: { editor: LexicalEditor }): JSX.Element 
     }, [editor, updateLinkEditor]);
 
     useEffect(() => {
-        console.log("is edit mode", isEditMode)
         if (isEditMode && inputRef.current) {
             inputRef.current.focus();
         }
@@ -153,8 +151,6 @@ function FloatingLinkEditor({ editor }: { editor: LexicalEditor }): JSX.Element 
       setEditMode(true)
     }, [])
     
-
-
     const [primaryMouseButtonDown, setPrimaryMouseButtonDown] = useState(false)
 
     useEffect(() => {

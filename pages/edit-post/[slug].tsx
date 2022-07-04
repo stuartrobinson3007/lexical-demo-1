@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -31,8 +31,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import HorizontalRulePlugin from '../../components/lexical/HorizontalRulePlugin';
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
-import { $getSelection, CLICK_COMMAND, COMMAND_PRIORITY_CRITICAL, COMMAND_PRIORITY_LOW, SELECTION_CHANGE_COMMAND } from 'lexical';
+import { $getRoot, $getSelection, $isElementNode, $isRangeSelection, CLICK_COMMAND, COMMAND_PRIORITY_CRITICAL, COMMAND_PRIORITY_LOW, SELECTION_CHANGE_COMMAND } from 'lexical';
 import TextFormatFloatingToolbarPlugin from '../../components/lexical/TextFormatFloatingToolbarPlugin';
+import CodeHighlightPlugin from '../../components/lexical/CodeHighlightPlugin';
+import { $moveCaretSelection } from 'lexical/LexicalSelection';
 
 function onError(error: Error) {
     console.error(error);
@@ -75,7 +77,9 @@ export const Editor = ({ post }) => {
             HeadingNode,
             HorizontalRuleNode,
             QuoteNode,
-            LinkNode
+            LinkNode,
+            CodeNode,
+            CodeHighlightNode
         ]
     };
 
@@ -170,8 +174,12 @@ export const Editor = ({ post }) => {
         const [editor] = useLexicalComposerContext();
 
         useEffect(() => {
-            // Focus the editor when the effect fires!
-            editor.focus();
+            editor.update(() => {
+                const root = $getRoot();
+                root.selectStart();
+                
+                return;
+            });
         }, [enterPressed]);
 
         return null;
@@ -246,6 +254,7 @@ export const Editor = ({ post }) => {
                                         initialEditorState={JSON.stringify(post.content)}
                                     />
                                     <HistoryPlugin />
+                                    <CodeHighlightPlugin />
                                     <ListPlugin />
                                     <ImagesPlugin />
                                     <LinkPlugin />

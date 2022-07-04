@@ -2,6 +2,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import clsx from 'clsx';
 
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
+import { $createCodeNode, $isCodeNode, registerCodeHighlighting } from '@lexical/code';
+
 import {
   $getRoot,
   $getSelection,
@@ -24,6 +26,7 @@ import {
   TextNode,
   ElementNode,
   COMMAND_PRIORITY_LOW,
+  $getNodeByKey,
 } from 'lexical';
 import {
   $createHeadingNode,
@@ -39,7 +42,7 @@ import {
   $wrapLeafNodesInElements,
   $isAtNodeEnd,
 } from '@lexical/selection';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { INSERT_IMAGE_COMMAND } from './ImagesPlugin';
 import {
   mergeRegister,
@@ -47,7 +50,7 @@ import {
 } from '@lexical/utils';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBold, faEdit, faHeading, faImage, faItalic, faLink, faMinus, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
+import { faBold, faCode, faEdit, faHeading, faImage, faItalic, faLink, faMinus, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import { createPortal } from 'react-dom';
 import TextFormatFloatingToolbarPlugin from './TextFormatFloatingToolbarPlugin';
@@ -68,6 +71,31 @@ export const blockTypeToBlockName = {
   quote: 'Quote',
 };
 
+const CODE_LANGUAGE_OPTIONS: [string, string][] = [
+  ['', '- Select language -'],
+  ['c', 'C'],
+  ['clike', 'C-like'],
+  ['css', 'CSS'],
+  ['html', 'HTML'],
+  ['js', 'JavaScript'],
+  ['markdown', 'Markdown'],
+  ['objc', 'Objective-C'],
+  ['plain', 'Plain Text'],
+  ['py', 'Python'],
+  ['rust', 'Rust'],
+  ['sql', 'SQL'],
+  ['swift', 'Swift'],
+  ['xml', 'XML'],
+];
+
+const CODE_LANGUAGE_MAP = {
+  javascript: 'js',
+  md: 'markdown',
+  plaintext: 'plain',
+  python: 'py',
+  text: 'plain',
+};
+
 const ToolbarPlugin = () => {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
@@ -79,21 +107,10 @@ const ToolbarPlugin = () => {
     null,
   );
 
-  useEffect(() => {
-    editor.registerCommand(
-      KEY_TAB_COMMAND,
-      (payload) => {
-        const event = payload as KeyboardEvent;
-        event.preventDefault();
-        return true;
-      },
-      COMMAND_PRIORITY_CRITICAL,
-    );
+  const [isCode, setIsCode] = useState(false);
 
-    return () => {
+  const [codeLanguage, setCodeLanguage] = useState<string>('');
 
-    }
-  }, []);
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -105,6 +122,9 @@ const ToolbarPlugin = () => {
           : anchorNode.getTopLevelElementOrThrow();
       const elementKey = element.getKey();
       const elementDOM = activeEditor.getElementByKey(elementKey);
+
+
+      setIsCode(selection.hasFormat('code'));
 
 
       if (elementDOM !== null) {
@@ -125,10 +145,48 @@ const ToolbarPlugin = () => {
           if (type in blockTypeToBlockName) {
             setBlockType(type as keyof typeof blockTypeToBlockName);
           }
+
+          if ($isCodeNode(element)) {
+            const language =
+              element.getLanguage() as keyof typeof CODE_LANGUAGE_MAP;
+            setCodeLanguage(
+              language ? CODE_LANGUAGE_MAP[language] || language : '',
+            );
+            return;
+          }
         }
       }
     }
   }, [activeEditor]);
+
+  const updateTabListener = useCallback(() => {
+    return (blockType !== 'code');
+  }, [editor]);
+
+  useEffect(() => {
+    return mergeRegister(
+      editor.registerUpdateListener(({ editorState }) => {
+        editorState.read(() => {
+          updateTabListener();
+        });
+      }),
+
+      editor.registerCommand(
+        KEY_TAB_COMMAND,
+        (payload) => {
+          const event = payload as KeyboardEvent;
+
+          const inCodeBlock = updateTabListener();
+
+          if (inCodeBlock) {
+            event.preventDefault();
+            return true;
+          }
+        },
+        COMMAND_PRIORITY_CRITICAL,
+      )
+    );
+  }, [editor, updateTabListener]);
 
 
   useEffect(() => {
@@ -145,7 +203,7 @@ const ToolbarPlugin = () => {
 
   useEffect(() => {
     return mergeRegister(
-      activeEditor.registerUpdateListener(({editorState}) => {
+      activeEditor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
           updateToolbar();
         });
@@ -199,15 +257,68 @@ const ToolbarPlugin = () => {
     }
   };
 
+  const formatCode = () => {
+    if (blockType !== 'code') {
+      editor.update(() => {
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+          if (selection.isCollapsed()) {
+            $wrapLeafNodesInElements(selection, () => $createCodeNode());
+          } else {
+            const textContent = selection.getTextContent();
+            const codeNode = $createCodeNode();
+            selection.insertNodes([codeNode]);
+            selection.insertRawText(textContent);
+          }
+        }
+
+
+      });
+    } else {
+      editor.update(() => {
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+          $wrapLeafNodesInElements(selection, () =>
+            $createParagraphNode(),
+          );
+        }
+      });
+    }
+  };
+
+  const onCodeLanguageSelect = useCallback(
+    (e: ChangeEvent) => {
+      activeEditor.update(() => {
+        if (selectedElementKey !== null) {
+          const node = $getNodeByKey(selectedElementKey);
+          if ($isCodeNode(node)) {
+            node.setLanguage((e.target as HTMLSelectElement).value);
+          }
+        }
+      });
+    },
+    [activeEditor, selectedElementKey],
+  );
 
   return (
     <div className="text-slate-400 rounded fixed z-20 shadow-sm bottom-8 left-1/2 transform -translate-x-1/2 px-1 py-1 bg-slate-100 mb-2 flex items-center">
 
       <TextFormatFloatingToolbarPlugin
-      editor={activeEditor}
-      blockType={blockType}
+        editor={activeEditor}
+        blockType={blockType}
+        isCode={isCode}
       />
 
+
+      <button
+        className='py-2 px-3 hover:bg-slate-200 transition-colors duration-100 ease-in rounded disabled:text-slate-300 disabled:hover:bg-inherit'
+        onClick={formatCode}
+        disabled={!!activeEditor._parentEditor}
+      >
+        <FontAwesomeIcon icon={faCode} className='h-5' />
+      </button>
       <button
         className='py-2 px-3 hover:bg-slate-200 transition-colors duration-100 ease-in rounded disabled:text-slate-300 disabled:hover:bg-inherit'
         onClick={() => {
@@ -247,7 +358,7 @@ const ToolbarPlugin = () => {
           (blockType === 'h2') ? 'bg-slate-300 text-slate-500' : 'bg-transparent'
         )}
         onClick={() => formatHeading('h2')}
-        disabled={!!editor._parentEditor}
+        disabled={!!activeEditor._parentEditor}
       >
         <FontAwesomeIcon icon={faHeading} className='h-5' />
       </button>
@@ -257,7 +368,7 @@ const ToolbarPlugin = () => {
           (blockType === 'h3') ? 'bg-slate-300 text-slate-500' : 'bg-transparent'
         )}
         onClick={() => formatHeading('h3')}
-        disabled={!!editor._parentEditor}
+        disabled={!!activeEditor._parentEditor}
       >
         <FontAwesomeIcon icon={faHeading} className='h-4' />
       </button>
@@ -267,10 +378,27 @@ const ToolbarPlugin = () => {
           (blockType === 'quote') ? 'bg-slate-300 text-slate-500' : 'bg-transparent'
         )}
         onClick={formatQuote}
-        disabled={!!editor._parentEditor}
+        disabled={!!activeEditor._parentEditor}
       >
         <FontAwesomeIcon icon={faQuoteRight} className='h-5' />
       </button>
+
+
+
+      {/*
+        blockType === 'code' && (
+          <>
+            <Select
+              className="toolbar-item code-language"
+              onChange={onCodeLanguageSelect}
+              options={CODE_LANGUAGE_OPTIONS}
+              value={codeLanguage}
+            />
+            <i className="chevron-down inside" />
+          </>
+        )
+        */
+      }
     </div>
   );
 };

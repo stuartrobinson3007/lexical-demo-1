@@ -47,10 +47,12 @@ import { blockTypeToBlockName } from './ToolbarPlugin';
 
 export default function TextFormatFloatingToolbarPlugin({
   editor,
-  blockType
+  blockType,
+  isCode
 }: {
   editor: LexicalEditor,
-  blockType: keyof typeof blockTypeToBlockName
+  blockType: keyof typeof blockTypeToBlockName,
+  isCode: boolean
 }): JSX.Element | null {
   const [isText, setIsText] = useState(false);
   const [isLink, setIsLink] = useState(false);
@@ -90,6 +92,8 @@ export default function TextFormatFloatingToolbarPlugin({
 
       // Update links
       const parent = node.getParent();
+
+
       if ($isLinkNode(parent) || $isLinkNode(node)) {
         setIsLink(true);
       } else {
@@ -118,7 +122,8 @@ export default function TextFormatFloatingToolbarPlugin({
     });
   }, [editor, updatePopup]);
 
-  if (!isText && !isLink) {
+
+  if ((!isText && !isLink) || (blockType === 'code')) {
     return null;
   }
 

@@ -11,10 +11,14 @@ export default function getSelectedNode(selection: RangeSelection): TextNode | E
     if (anchorNode === focusNode) {
         return anchorNode;
     }
+    return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
+
+    ////////////////////////////////////////////////////////////////////////////////
     const isBackward = selection.isBackward();
     if (isBackward) {
         return $isAtNodeEnd(focus) ? anchorNode : focusNode;
     } else {
         return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
     }
+    ////////////////////////////////////////////////////////////////////////////////
 }
