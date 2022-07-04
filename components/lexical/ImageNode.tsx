@@ -357,7 +357,6 @@ function ImageComponent({
     editor,
     isSelected,
     nodeKey,
-    onDelete,
     setSelected,
   ]);
 
